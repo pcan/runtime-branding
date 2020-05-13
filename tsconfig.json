@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "module": "CommonJS",
+        "target": "es2017",
+        "lib": ["es2017"],
+        "outDir": "./dist",
+        "sourceMap": true,
+        "declaration": true,
+        "strict": true,
+        "typeRoots": ["node_modules/@types"]
+    },
+    "exclude": ["node_modules", "test", "dist"],
+    "include": ["src/**/*"],
+    "compileOnSave": true
+}

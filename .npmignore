@@ -1,0 +1,7 @@
+test
+coverage
+.nyc_output
+ISSUE_TEMPLATE.md
+*.tgz
+*.tar.gz
+temp

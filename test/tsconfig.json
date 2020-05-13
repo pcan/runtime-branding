@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "moduleResolution": "node",
+        "module": "CommonJS",
+        "target": "ES2017",
+        "strict": true,
+        "outDir": "./built",
+        "lib": ["ES2017"],
+        "typeRoots": ["../node_modules/@types"]
+    }
+}

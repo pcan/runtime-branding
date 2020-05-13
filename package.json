@@ -1,0 +1,70 @@
+{
+  "name": "runtime-branding",
+  "version": "0.1.3",
+  "description": "Runtime Branding API for TypeScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepare": "npx tsc",
+    "test": "nyc mocha"
+  },
+  "keywords": [
+    "typescript",
+    "branding",
+    "brand",
+    "runtime",
+    "nominal",
+    "tag",
+    "tagging",
+    "flavour"
+  ],
+  "author": "Pierantonio Cangianiello",
+  "repository": "https://github.com/pcan/runtime-branding",
+  "license": "MIT",
+  "mocha": {
+    "require": [
+      "ts-node/register",
+      "source-map-support/register"
+    ],
+    "color": true,
+    "full-trace": true,
+    "bail": true,
+    "slow": 100,
+    "spec": [
+      "test/**/*.test.ts"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^10.17.21",
+    "@types/sinon": "^9.0.0",
+    "chai": "^4.2.0",
+    "mocha": "^7.1.2",
+    "nyc": "^15.0.1",
+    "sinon": "^9.0.2",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^8",
+    "typescript": "^3"
+  },
+  "dependencies": {
+    "@types/sinon-chai": "^3.2.4",
+    "sinon-chai": "^3.5.0"
+  }
+}
