@@ -114,7 +114,7 @@ export function createBranding<B extends object, X extends object = object>(bran
     branding.merge = merge;
     branding[brand] = brandObject;
 
-    return Object.freeze(branding);
+    return Object.seal(branding);
 }
 
 
@@ -159,6 +159,5 @@ function mixin<B1 extends object, B2 extends object, X1 extends object, X2 exten
     branding.merge = merge;
     branding[brand] = newBrand;
 
-    return Object.freeze(branding);
-
+    return Object.seal(branding);
 }
