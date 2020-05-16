@@ -143,6 +143,26 @@ describe(`Basic branding functionality`, () => {
         s2.should.have.been.calledWith(o, { value: 'test' });
     });
 
+    it(`Should not allow changing methods on branding`, () => {
+        const sym = Symbol();
+        const customBrand = { [sym]: true };
+        const branding = createBranding(customBrand);
+
+        chai.expect(() => {
+            branding.has = function (...args: any[]) { } as typeof branding['has']
+        }).to.throw();
+    });
+
+    it(`Should allow adding new properties on branding`, () => {
+        const sym = Symbol();
+        const customBrand = { [sym]: true };
+        const branding: any = createBranding(customBrand);
+
+        branding.x = 3;
+
+        chai.expect(branding.x).to.be.equal(3);
+    });
+
 });
 
 describe(`Branding mixin functionality`, () => {

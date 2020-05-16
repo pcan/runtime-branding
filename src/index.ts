@@ -76,7 +76,7 @@ export function createBranding<B extends object, X extends object = object>(bran
         return brandedObjects.has(obj);
     }
 
-    function assert(obj: object): asserts obj is BrandedObject<B, X>{
+    function assert(obj: object): asserts obj is BrandedObject<B, X> {
         if (!brandedObjects.has(obj)) {
             throw new Error("Object not branded.");
         }
@@ -113,8 +113,9 @@ export function createBranding<B extends object, X extends object = object>(bran
     branding.refine = refine;
     branding.merge = merge;
     branding[brand] = brandObject;
+    freezeProperties(branding);
 
-    return Object.seal(branding);
+    return branding;
 }
 
 
@@ -158,6 +159,12 @@ function mixin<B1 extends object, B2 extends object, X1 extends object, X2 exten
     branding.refine = refine;
     branding.merge = merge;
     branding[brand] = newBrand;
+    freezeProperties(branding);
 
-    return Object.seal(branding);
+    return branding;
+}
+
+function freezeProperties(obj: object) {
+    Object.getOwnPropertyNames(obj)
+        .forEach(p => Object.defineProperty(obj, p, { configurable: false, writable: false }));
 }
