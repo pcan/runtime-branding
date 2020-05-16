@@ -1,6 +1,6 @@
 {
   "name": "runtime-branding",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Runtime Branding API for TypeScript",
   "main": "dist/index.js",
   "scripts": {
