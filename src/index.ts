@@ -113,7 +113,6 @@ export function createBranding<B extends object, X extends object = object>(bran
     branding.refine = refine;
     branding.merge = merge;
     branding[brand] = brandObject;
-    freezeProperties(branding);
 
     return branding;
 }
@@ -159,12 +158,6 @@ function mixin<B1 extends object, B2 extends object, X1 extends object, X2 exten
     branding.refine = refine;
     branding.merge = merge;
     branding[brand] = newBrand;
-    freezeProperties(branding);
 
     return branding;
-}
-
-function freezeProperties(obj: object) {
-    Object.getOwnPropertyNames(obj)
-        .forEach(p => Object.defineProperty(obj, p, { configurable: false, writable: false }));
 }
