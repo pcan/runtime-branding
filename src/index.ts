@@ -44,14 +44,19 @@ export interface Branding<B extends object, X extends object = object> extends B
      * @param newBrand the new brand that refines the current one
      * @param callback a callback invoked when object are branded with the refined branding
      */
-    refine<N extends object>(newBrand: N, callback?: BrandingCallback<N, X>): Branding<N & B, X>;
+    refine<N extends object, Y extends X = X>(newBrand: N, callback?: BrandingCallback<N, Y>): Branding<N & B, Y>;
 
     /**
      * Merges the given branding with the current one.
      * 
      * @param branding the other brand to merge with
      */
-    merge<C extends object, Y extends object>(branding: Branding<C, Y>): Branding<B & C, X & Y>
+    merge<C extends object, Y extends X = X>(branding: Branding<C, Y>): Branding<B & C, Y>;
+
+    /**
+     * Returns this Branding with a different generic bound for target objects.
+     */
+    generic<T extends object>(): Branding<B, T>;
 }
 
 /**
@@ -72,7 +77,7 @@ export function createBranding<B extends object, X extends object = object>(bran
 
     const brandedObjects = new WeakSet<object>();
 
-    function has(obj: object): obj is BrandedObject<B, X> {
+    function has<Y extends X>(obj: object): obj is BrandedObject<B, Y> {
         return brandedObjects.has(obj);
     }
 
@@ -98,20 +103,25 @@ export function createBranding<B extends object, X extends object = object>(bran
         return obj as Branded<T, B>;
     }
 
-    function refine<N extends object>(newBrand: N, newCallback?: BrandingCallback<N, X>): Branding<N & B, X> {
+    function refine<N extends object, Y extends X = X>(newBrand: N, newCallback?: BrandingCallback<N, Y>): Branding<N & B, Y> {
         const b = Object.assign({}, newBrand, brandObject);
-        const refinedBranding = createBranding<N & B, X>(b, newCallback);
-        return merge<N, X>(refinedBranding);
+        const refinedBranding = createBranding<N & B, Y>(b, newCallback);
+        return merge<N, Y>(refinedBranding);
     }
 
-    function merge<C extends object, Y extends object>(other: Branding<C, Y>): Branding<B & C, X & Y> {
-        return mixin<B, C, X, Y>(branding, other);
+    function merge<C extends object, Y extends X = X>(branding1: Branding<C, Y>): Branding<B & C, Y> {
+        return mixin<B, C, Y>(branding, branding1);
     }
 
-    branding.has = has; // maybe all these should be built separately, then Object.assigned to branding()
+    function generic<T extends object>(): Branding<B, T> {
+        return branding as Branding<B, T>;
+    }
+
+    branding.has = has; // TODO: maybe all these should be built separately, then Object.assigned to branding()
     branding.assert = assert;
     branding.refine = refine;
     branding.merge = merge;
+    branding.generic = generic;
     branding[brand] = brandObject;
 
     return branding;
@@ -119,36 +129,42 @@ export function createBranding<B extends object, X extends object = object>(bran
 
 
 /**
- * Mixes two differend brandings in a single one.
+ * Mixes two different brandings in a single one.
  * 
  * @param fn1 The first branding function
  * @param fn2 The second branding function
  */
-function mixin<B1 extends object, B2 extends object, X1 extends object, X2 extends object>
-    (fn1: Branding<B1, X1>, fn2: Branding<B2, X2>): Branding<B1 & B2, X1 & X2> {
+function mixin<B1 extends object, B2 extends object, X extends object>
+    (fn1: Branding<B1, X>, fn2: Branding<B2, X>): Branding<B1 & B2, X> {
 
-    function has(obj: object): obj is BrandedObject<B1 & B2, X1 & X2> {
+    type M = B1 & B2;
+
+    function has<Y extends X>(obj: object): obj is BrandedObject<M, Y> {
         return fn1.has(obj) && fn2.has(obj);
     }
 
-    function assert(obj: object): asserts obj is BrandedObject<B1 & B2, X1 & X2> {
+    function assert(obj: object): asserts obj is BrandedObject<M, X> {
         fn1.assert(obj);
         fn2.assert(obj);
     }
 
-    function branding<T extends X1 & X2>(obj: T): Branded<T, B1 & B2> {
+    function branding<T extends X>(obj: T) {
         fn1(obj);
         fn2(obj);
-        return obj as Branded<T, B1 & B2>;
+        return obj as Branded<T, M>;
     }
 
-    function refine<N extends object>(newBrand: N, callback?: BrandingCallback<N, X1 & X2>): Branding<N & B1 & B2, X1 & X2> {
+    function refine<N extends object, Y extends X = X>(newBrand: N, callback?: BrandingCallback<N, Y>): Branding<N & M, Y> {
         const b = Object.assign({}, newBrand, fn1[brand], fn2[brand]);
         return createBranding(b, callback);
     }
 
-    function merge<C extends object, Y extends object>(branding1: Branding<C, Y>): Branding<B1 & B2 & C, X1 & X2 & Y> {
-        return mixin<B1 & B2, C, X1 & X2, Y>(branding, branding1);
+    function merge<C extends object, Y extends X = X>(branding1: Branding<C, Y>): Branding<M & C, Y> {
+        return mixin<M, C, Y>(branding, branding1);
+    }
+
+    function generic<T extends object>(): Branding<M, T> {
+        return branding as Branding<M, T>;
     }
 
     const newBrand = Object.assign({}, fn1[brand], fn2[brand]);
@@ -157,6 +173,7 @@ function mixin<B1 extends object, B2 extends object, X1 extends object, X2 exten
     branding.assert = assert;
     branding.refine = refine;
     branding.merge = merge;
+    branding.generic = generic;
     branding[brand] = newBrand;
 
     return branding;
